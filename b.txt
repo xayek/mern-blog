@@ -9,4 +9,4 @@ npm i nodemon (mern-blog)
 npm i mongoose (mern-blog)
 npm install mongodb (mern-blog)
 npm i dotenv (mern-blog)
-
+npm i bcryptjs (mern-blog)
