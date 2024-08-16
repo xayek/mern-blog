@@ -1,0 +1,12 @@
+npm create vite@latest (mern-blog)
+npm install -D tailwindcss (client) 
+npx tailwindcss init (client)
+npm install react-router-dom" (client)
+npm install flowbite-react (client) 
+npm install react-icons (client)
+npm i express (mern-blog)
+npm i nodemon (mern-blog)
+npm i mongoose (mern-blog)
+npm install mongodb (mern-blog)
+npm i dotenv (mern-blog)
+
