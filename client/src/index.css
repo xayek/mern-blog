@@ -10,6 +10,13 @@ body {
     font-size: 1.05rem;
   }
 
+  .post-content {
+    max-width: 100%; /* İçeriğin maksimum genişliğini ayarlar */
+    overflow-wrap: break-word; /* Kelime kırılmasını sağlar */
+    word-wrap: break-word; /* Eski tarayıcı desteği için */
+    hyphens: auto; /* Kelimeleri keserken heceleme ekler */
+  }
+
   .post-content p {
     margin-bottom: 0.5rem;
   }
