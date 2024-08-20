@@ -31,10 +31,12 @@ export const getposts = async (req, res, next) => {
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 9;
     const sortDirection = req.query.order === 'asc' ? 1 : -1;
+
+    // Querying the posts with filters
     const posts = await Post.find({
       ...(req.query.userId && { userId: req.query.userId }),
       ...(req.query.slug && { slug: req.query.slug }),
-      ...(req.query.slug && { category: req.query.slug }),
+      ...(req.query.category && { category: req.query.category }),
       ...(req.query.postId && { _id: req.query.postId }),
       ...(req.query.searchTerm && {
         $or: [
@@ -50,16 +52,8 @@ export const getposts = async (req, res, next) => {
     const totalPosts = await Post.countDocuments();
 
     const now = new Date();
-
-    const oneMonthAgo = new Date(
-      now.getFullYear(),
-      now.getMonth() - 1,
-      now.getDate()
-    );
-
-    const lastMonthPosts = await Post.countDocuments({
-      createdAt: { $gte: oneMonthAgo },
-    });
+    const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+    const lastMonthPosts = await Post.countDocuments({ createdAt: { $gte: oneMonthAgo } });
 
     res.status(200).json({
       posts,
@@ -71,12 +65,16 @@ export const getposts = async (req, res, next) => {
   }
 };
 
+
 export const deletepost = async (req, res, next) => {
   if (!req.user.isAdmin || req.user.id !== req.params.userId) {
     return next(errorHandler(403, 'You are not allowed to delete this post'));
   }
   try {
-    await Post.findByIdAndDelete(req.params.postId);
+    const deletedPost = await Post.findByIdAndDelete(req.params.postId);
+    if (!deletedPost) {
+      return next(errorHandler(404, 'Post not found'));
+    }
     res.status(200).json('The post has been deleted');
   } catch (error) {
     next(error);
@@ -100,6 +98,9 @@ export const updatepost = async (req, res, next) => {
       },
       { new: true }
     );
+    if (!updatedPost) {
+      return next(errorHandler(404, 'Post not found'));
+    }
     res.status(200).json(updatedPost);
   } catch (error) {
     next(error);

@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
-import { set } from 'mongoose';
 
 export default function DashPosts() {
   const { currentUser } = useSelector((state) => state.user);
@@ -11,6 +10,7 @@ export default function DashPosts() {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [postIdToDelete, setPostIdToDelete] = useState('');
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
@@ -21,15 +21,17 @@ export default function DashPosts() {
           if (data.posts.length < 9) {
             setShowMore(false);
           }
+        } else {
+          console.log('Error fetching posts:', data.message);
         }
       } catch (error) {
-        console.log(error.message);
+        console.log('Error fetching posts:', error.message);
       }
     };
     if (currentUser.isAdmin) {
       fetchPosts();
     }
-  }, [currentUser._id]);
+  }, [currentUser._id, currentUser.isAdmin]);
 
   const handleShowMore = async () => {
     const startIndex = userPosts.length;
@@ -43,9 +45,11 @@ export default function DashPosts() {
         if (data.posts.length < 9) {
           setShowMore(false);
         }
+      } else {
+        console.log('Error fetching more posts:', data.message);
       }
     } catch (error) {
-      console.log(error.message);
+      console.log('Error fetching more posts:', error.message);
     }
   };
 
@@ -60,17 +64,19 @@ export default function DashPosts() {
       );
       const data = await res.json();
       if (!res.ok) {
-        console.log(data.message);
+        console.log('Error deleting post:', data.message);
+        alert('Failed to delete post: ' + data.message);
       } else {
         setUserPosts((prev) =>
           prev.filter((post) => post._id !== postIdToDelete)
         );
+        alert('Post deleted successfully');
       }
     } catch (error) {
-      console.log(error.message);
+      console.log('Error deleting post:', error.message);
+      alert('Error occurred: ' + error.message);
     }
   };
-
 
   return (
     <div className='table-auto overflow-x-scroll md:mx-auto p-3 scrollbar scrollbar-track-slate-100 scrollbar-thumb-slate-300 dark:scrollbar-track-slate-700 dark:scrollbar-thumb-slate-500'>
@@ -83,13 +89,11 @@ export default function DashPosts() {
               <Table.HeadCell>Post title</Table.HeadCell>
               <Table.HeadCell>Category</Table.HeadCell>
               <Table.HeadCell>Delete</Table.HeadCell>
-              <Table.HeadCell>
-                <span>Edit</span>
-              </Table.HeadCell>
+              <Table.HeadCell>Edit</Table.HeadCell>
             </Table.Head>
-            {userPosts.map((post) => (
-              <Table.Body className='divide-y'>
-                <Table.Row className='bg-white dark:border-gray-700 dark:bg-gray-800'>
+            <Table.Body className='divide-y'>
+              {userPosts.map((post) => (
+                <Table.Row key={post._id} className='bg-white dark:border-gray-700 dark:bg-gray-800'>
                   <Table.Cell>
                     {new Date(post.updatedAt).toLocaleDateString()}
                   </Table.Cell>
@@ -112,7 +116,7 @@ export default function DashPosts() {
                   </Table.Cell>
                   <Table.Cell>{post.category}</Table.Cell>
                   <Table.Cell>
-                  <span
+                    <span
                       onClick={() => {
                         setShowModal(true);
                         setPostIdToDelete(post._id);
@@ -127,12 +131,12 @@ export default function DashPosts() {
                       className='text-teal-500 hover:underline'
                       to={`/update-post/${post._id}`}
                     >
-                      <span>Edit</span>
+                      Edit
                     </Link>
                   </Table.Cell>
                 </Table.Row>
-              </Table.Body>
-            ))}
+              ))}
+            </Table.Body>
           </Table>
           {showMore && (
             <button
