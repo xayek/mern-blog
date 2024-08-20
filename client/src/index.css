@@ -16,9 +16,9 @@ body {
   
   .post-content h1 {
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 500;
     font-family: sans-serif;
-    margin: 1.5rem 0;
+    margin: 1.5rem 0.5;
   }
   
   .post-content h2 {
@@ -39,3 +39,4 @@ body {
   .dark .post-content a {
     color: red;
   }
+
